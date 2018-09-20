@@ -1,0 +1,127 @@
+// font
+$complement-font: "PingFang SC", RobotoDraft, Roboto, "Helvetica Neue", Helvetica, Arial, STHeiti,
+"华文黑体", "Microsoft YaHei", "微软雅黑", sans-serif;
+$font-stack: Rajdhani, Roboto, $complement-font;
+$font-secondary: Roboto, $complement-font;
+
+// height
+
+// colors
+$color-light-blue: rgba(97, 175, 254, .1);
+$color-blue: #0a88ff;
+$color-white: rgb(254, 254, 254);
+// 大小
+@mixin size($width: 100%, $height: 100%) {
+  width: $width;
+  height: $height;
+}
+
+@mixin avatar-size($width: 48px, $height: 48px) {
+  width: $width;
+  height: $height;
+  border-radius: 50%;
+}
+
+@mixin max-size($max-width: 100vh, $max-height: 100vw) {
+  max-width: $max-width;
+  max-height: $max-height;
+}
+
+// 响应式规则
+$_ly-xs-width: 320px;
+$_md-sm-width: 768px; // 首页 600 break-point 明显会炸 这里都 调整成 768
+$_md-md-width: 960px;
+$_md-lg-width: 1440px;
+
+// x < 768
+@mixin md-rd-xs {
+  @media (max-width: #{$_md-sm-width - 1px}) {
+    @content;
+  }
+}
+
+// 768 <= x < 960
+@mixin md-rd-sm {
+  @media (min-width: #{$_md-sm-width}) and (max-width: #{$_md-md-width - 1px}) {
+    @content;
+  }
+}
+
+// 960 <= x < 1440
+@mixin md-rd-md {
+  @media (min-width: #{$_md-md-width}) and (max-width: #{$_md-lg-width - 1px}) {
+    @content;
+  }
+}
+
+// x >= 768
+@mixin md-rd-gt-xs {
+  @media (min-width: #{$_md-sm-width}) {
+    @content;
+  }
+}
+
+// x >= 960
+@mixin md-rd-gt-sm {
+  @media (min-width: #{$_md-md-width}) {
+    @content;
+  }
+}
+
+// x >= 1440
+@mixin md-rd-gt-md {
+  @media (min-width: #{$_md-lg-width}) {
+    @content;
+  }
+}
+
+// x < 1440
+@mixin md-rd-lt-lg {
+  @media (max-width: #{$_md-lg-width -1px}) {
+    @content;
+  }
+}
+
+// x < 960
+@mixin md-rd-lt-md {
+  @media (max-width: #{$_md-md-width - 1px}) {
+    @content;
+  }
+}
+
+// x < 768
+@mixin md-rd-lt-sm {
+  @media (max-width: #{$_md-sm-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin circle-box($diameter: 24px) {
+  width: $diameter;
+  height: $diameter;
+  border-radius: 50%;
+}
+
+@mixin background-overlay($bg-color, $opacity) {
+  background-color: rgba($bg-color, $opacity);
+}
+
+%background-style {
+  background: {
+    size: cover;
+    repeat: no-repeat;
+    position: center center;
+  }
+}
+
+@mixin limit-lines($lines: 1) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+}
+
+// Z-INDEX
+$Z-INDEX-TOP: 99;

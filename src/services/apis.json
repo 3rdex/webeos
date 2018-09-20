@@ -1,0 +1,158 @@
+[
+  {
+    "key": "get_info",
+    "title": {
+      "name": "get info",
+      "path": "/v1/chain/get_info",
+      "description": "Get eos general info"
+    },
+    "requestMethod": "getInfo"
+  },
+  {
+    "key": "get_account",
+    "title": {
+      "name": "get account",
+      "path": "/v1/chain/get_account",
+      "description": "Get eos account information"
+    },
+    "body": {
+      "account_name": {
+        "val": "",
+        "placeHolder": "eosio",
+        "label": "account_name"
+      }
+    },
+    "requestMethod": "getAccount"
+  },
+  {
+    "key": "get_block",
+    "title": {
+      "name": "get block",
+      "path": "/v1/chain/get_block",
+      "description": "Get block by id or #"
+    },
+    "body": {
+      "block_num_or_id": {
+        "val": "",
+        "placeHolder": "",
+        "label": "block_num_or_id"
+      }
+    },
+    "requestMethod": "getBlock"
+  },
+  {
+    "key": "get_table",
+    "title": {
+      "name": "get table",
+      "path": "/v1/chain/get_table_rows",
+      "description": ""
+    },
+    "body": {
+      "code": {
+        "val": "",
+        "placeHolder": "eosio",
+        "label": "code"
+      },
+      "scope": {
+        "val": "",
+        "placeHolder": "eosio",
+        "label": "scope"
+      },
+      "table": {
+        "val": "",
+        "placeHolder": "",
+        "label": "table"
+      }
+    },
+    "requestMethod": "getTable"
+  },
+  {
+    "key": "get_currency_balance",
+    "title": {
+      "name": "get currency balance",
+      "path": "/v1/chain/get_currency_balance",
+      "description": ""
+    },
+    "body": {
+      "code": {
+        "val": "eosio.token",
+        "placeHolder": "eosio",
+        "label": "code"
+      },
+      "account": {
+        "val": "",
+        "placeHolder": "eosio",
+        "label": "account"
+      },
+      "symbol": {
+        "val": "",
+        "placeHolder": "",
+        "label": "symbol"
+      }
+    },
+    "requestMethod": "getCurrencyBalance"
+  },
+  {
+    "key": "issue_token",
+    "title": {
+      "name": "issue_token",
+      "path": "/v1/chain/push_transactions",
+      "description": "this methods issues a new token"
+    },
+    "body": {
+      "account": {
+        "val": "",
+        "placeholder": "",
+        "label": "account name"
+      },
+      "count": {
+        "val": "",
+        "placeholder": "",
+        "label": "total new token count"
+      },
+      "unit": {
+        "val": "",
+        "placeholder": "",
+        "label": "new token name"
+      }
+    },
+    "requestMethod": "issueToken"
+  },
+  {
+    "key": "push_transaction",
+    "title": {
+      "name": "push transaction",
+      "path": "/v1/chain/push_transactions",
+      "description": "This method expects a transactions in JSON format and will attempt to apply it to the blockchain.This method push multiple transactions at once."
+    },
+    "body": {
+      "account_name": {
+        "val": "",
+        "placeholder": "",
+        "label": "account name"
+      },
+      "name": {
+        "val": "",
+        "placeholder": "",
+        "label": "action name"
+      },
+      "user": {
+        "val": "",
+        "placeholder": "",
+        "label": "user"
+      },
+      "permission": {
+        "val": "active",
+        "placeholder": "active",
+        "label": "user permission"
+      },
+      "data": {
+        "val": "{}",
+        "placeholder": "",
+        "label": "transaction payload",
+        "isJson": true
+      }
+    },
+    "requestMethod": "pushTransactions"
+  }
+]
