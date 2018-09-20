@@ -1,7 +1,7 @@
 {
   "name": "app",
   "version": "0.1.0",
-  "description": "A web ui for eos api",
+  "description": "An opensource web toolkit for eos development. Check balance, issue a token, transfer, get block info, all in one place!",
   "author": "3rdex",
   "private": true,
   "scripts": {
