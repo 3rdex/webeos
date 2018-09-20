@@ -38,7 +38,8 @@ export class EOSAPIService {
   }
 
   static async issueToken({ eos, payload }) {
-    const token = `${Number(payload.count).toFixed(3)} ${payload.unit}`;
+    const token = `${Number(payload.count)
+      .toFixed(3)} ${payload.unit}`;
     await eos.transaction(payload.account, (account) => {
       account.create(payload.account, token);
       account.issue(payload.account, token, 'issue');

@@ -59,9 +59,9 @@
       </el-row>
       <div class="divider"></div>
       <el-row>
-        <el-col :span="6"><p class="bold font-12">HttpEndPoint</p></el-col>
+        <el-col :span="6"><p class="bold font-12">httpEndpoint</p></el-col>
         <el-col :span="18">
-          <el-input :value="httpEndPoint" @change="updateHttpEndPoint"></el-input>
+          <el-input :value="httpEndpoint" @change="updatehttpEndpoint"></el-input>
         </el-col>
       </el-row>
       <el-row>
@@ -113,7 +113,7 @@
         default: false,
         required: false,
       },
-      httpEndPoint: {
+      httpEndpoint: {
         type: String,
         default: 'http://127.0.0.1:8888',
       },
@@ -127,11 +127,11 @@
         this.$emit('execute');
       },
       onClear() {
-        this.httpEndPoint = '';
+        this.httpEndpoint = '';
         this.privateKey = '';
         this.$emit('clear');
       },
-      updateHttpEndPoint(val) {
+      updatehttpEndpoint(val) {
         console.log('in update http end point ', val);
         this.$emit('change-http-end-point', val);
       },

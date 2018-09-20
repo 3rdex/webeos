@@ -84,7 +84,7 @@
     <div class="api-title-container">
       <div class="summary">
         <div class="action">POST</div>
-        <div class="path">{{httpEndPoint + (title.path || '')}}</div>
+        <div class="path">{{httpEndpoint + (title.path || '')}}</div>
       </div>
     </div>
     <div class="api-content-container background-color-blue">
@@ -97,12 +97,26 @@
           <el-col :span="18"><p class="bold font-12">Description</p></el-col>
         </el-row>
         <div class="divider"></div>
-        <input-with-label v-model="httpEndPoint"
-                          label-name="HttpEndPoint" place-holder="http://127.0.0.1:8888">
-        </input-with-label>
-        <input-with-label v-model="privateKey"
-                          label-name="EOS Private Key" place-holder="your account private key">
-        </input-with-label>
+        <el-row>
+          <el-col :span="6">
+            <div><p class="bold font-14">HTTP END POINT</p></div>
+          </el-col>
+          <el-col :span="18">
+            <div>
+              <el-input v-model="httpEndpoint" placeholder="http://127.0.0.1:8888"></el-input>
+            </div>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">
+            <div><p class="bold font-14">Key Provider</p></div>
+          </el-col>
+          <el-col :span="18">
+            <div>
+              <el-input v-model="privateKey" placeholder="your eos account private key"></el-input>
+            </div>
+          </el-col>
+        </el-row>
       </article>
       <article class="request-title">
         Request Body
@@ -114,15 +128,19 @@
         </el-row>
         <div class="divider"></div>
         <div slot="request" v-if="bodyData">
-          <input-with-label v-for="(item, key) in body"
-                            @input="(val) => updateKey(key, val)"
-                            :id="key"
-                            :key="key"
-                            :value="bodyData[key]"
-                            :json-input="item.isJson"
-                            :label-name="item.label"
-                            :place-holder="item.description">
-          </input-with-label>
+          <el-row v-for="(item, key) in body" :key="key">
+            <el-col :span="6">
+              <div>
+                <p class="bold font-14">{{item.label}}</p>
+              </div>
+            </el-col>
+            <el-col :span="18">
+              <div>
+                <el-input :type="item.isJson ? 'textarea' : ''"
+                          v-model="bodyData[key]" :placeholder="item.description"></el-input>
+              </div>
+            </el-col>
+          </el-row>
         </div>
         <pre class="curl">{{curl}}</pre>
         <div class="action-row">
@@ -144,7 +162,6 @@
 
 <script>
   import { createNamespacedHelpers } from 'vuex';
-  import InputWithLabel from '../InputWithLabel';
   import { EOSAPIService } from '../../services/EOSAPIService';
   import { PANEL_STORE_NAME } from '../../store/modules/panel';
 
@@ -171,21 +188,18 @@
         required: true,
       },
     },
-    components: {
-      'input-with-label': InputWithLabel,
-    },
     data() {
       return {
         bodyData: {},
         responseData: null,
-        httpEndPoint: 'http://127.0.0.1:8888',
+        httpEndpoint: 'https://eos.greymass.com',
         privateKey: '',
       };
     },
     computed: {
       curl() {
         return `curl --request POST \\
-        --url ${this.httpEndPoint}/${this.title.path || ''} \\
+        --url ${this.httpEndpoint}/${this.title.path || ''} \\
         --data = ${JSON.stringify(this.bodyData)}`;
       },
     },
@@ -205,18 +219,19 @@
       },
       onClear() {
         this.responseData = null;
-        this.httpEndPoint = '';
+        this.httpEndpoint = 'https://eos.greymass.com';
         const bodyData = {};
-        Object.keys(this.body).forEach((key) => {
-          bodyData[key] = this.body[key].val;
-        });
+        Object.keys(this.body)
+          .forEach((key) => {
+            bodyData[key] = this.body[key].val;
+          });
         this.bodyData = bodyData;
       },
       async onSubmit() {
         try {
           const eos = EOSAPIService.getEos({
             config: {
-              httpEndPoint: this.httpEndPoint,
+              httpEndpoint: this.httpEndpoint,
               keyProvider: this.privateKey,
             },
           });
@@ -234,9 +249,10 @@
     mounted() {
       if (this.body) {
         this.bodyData = {};
-        Object.keys(this.body).forEach((key) => {
-          this.bodyData[key] = this.body[key].val;
-        });
+        Object.keys(this.body)
+          .forEach((key) => {
+            this.bodyData[key] = this.body[key].val;
+          });
         console.log('bodyData', this.bodyData);
       }
     },
