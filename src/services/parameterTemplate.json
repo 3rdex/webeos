@@ -1,0 +1,16 @@
+[
+  {
+    "key": "paramTemplate1",
+    "parameter": {
+      "httpEndpoint": "www.paramTemplate1.com",
+      "keyProvider": "+1p"
+    }
+  },
+  {
+    "key": "paramTemplate2",
+    "parameter": {
+      "httpEndpoint": "www.paramTemplate2.com",
+      "keyProvider": "+2p"
+    }
+  }
+]

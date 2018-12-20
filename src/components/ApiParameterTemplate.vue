@@ -1,5 +1,5 @@
 <style scoped lang="scss">
-  @import '../../styles/util';
+  @import '../styles/util';
 
   .api-title-container {
     display: flex;
@@ -30,7 +30,10 @@
         font-weight: bold;
       }
       .dropdown-menu {
-        flex-flow: 1;
+        justify-content: flex-end;
+      }
+      .el-select .el-input {
+        width: 130px;
       }
     }
   }
@@ -87,7 +90,7 @@
     <div class="api-title-container">
       <div class="summary">
         <div class="action">POST</div>
-        <div class="path">{{httpEndpoint + (title.path || '')}}</div>
+        <div class="path">{{ sharedHttpEndpoint + (title.path || '') }}</div>
         <div class="dropdown-menu">
           <el-dropdown split-button type="primary" @click="dialogVisible = true"
           @command="onSelect">
@@ -142,7 +145,7 @@
           </el-col>
           <el-col :span="18">
             <div>
-              <el-input v-model="httpEndpoint" placeholder="http://127.0.0.1:8888"></el-input>
+              <el-input v-model="sharedHttpEndpoint" placeholder="http://127.0.0.1:8888"></el-input>
             </div>
           </el-col>
         </el-row>
@@ -152,49 +155,11 @@
           </el-col>
           <el-col :span="18">
             <div>
-              <el-input v-model="keyProvider"
+              <el-input v-model="sharedKeyProvider"
                 placeholder="your eos account private key"></el-input>
             </div>
           </el-col>
         </el-row>
-      </article>
-      <article class="request-title">
-        Request Body
-      </article>
-      <article class="request-container">
-        <el-row>
-          <el-col :span="6"><p class="bold font-12">Name</p></el-col>
-          <el-col :span="18"><p class="bold font-12">Description</p></el-col>
-        </el-row>
-        <div class="divider"></div>
-        <div slot="request" v-if="bodyData">
-          <el-row v-for="(item, key) in body" :key="key">
-            <el-col :span="6">
-              <div>
-                <p class="bold font-14">{{item.label}}</p>
-              </div>
-            </el-col>
-            <el-col :span="18">
-              <div>
-                <el-input :type="item.isJson ? 'textarea' : ''"
-                          v-model="bodyData[key]" :placeholder="item.description"></el-input>
-              </div>
-            </el-col>
-          </el-row>
-        </div>
-        <pre class="curl">{{curl}}</pre>
-        <div class="action-row">
-          <el-button type="primary" class="submit" @click.stop="onSubmit">
-            Submit
-          </el-button>
-          <el-button type="warning" class="warning" @click.stop="onClear">
-            Clear
-          </el-button>
-        </div>
-      </article>
-      <article class="response-title">Responses</article>
-      <article class="response-container">
-        <pre class="json-response">{{responseData}}</pre>
       </article>
     </div>
   </section>
@@ -202,26 +167,16 @@
 
 <script>
   import { createNamespacedHelpers } from 'vuex';
-  import { EOSAPIService } from '../../services/EOSAPIService';
-  import { PANEL_STORE_NAME } from '../../store/modules/panel';
-  import { LocalStorage, StorageKeys } from '../../services/LocalStorage';
+  import { TEMPLATE_STORE_NAME } from '../store/modules/parameterTemplate';
+  import { LocalStorage, StorageKeys } from '../services/LocalStorage';
 
-  const { mapActions: mapPanelActions } = createNamespacedHelpers(PANEL_STORE_NAME);
-
+  const { mapActions: mapTemplateActions } = createNamespacedHelpers(TEMPLATE_STORE_NAME);
   export default {
-    name: 'GeneralApiTemplate',
+    name: 'ApiParameterTemplate',
     props: {
-      apiKey: {
-        type: String,
-        default: '',
-      },
       title: {
         type: Object,
         required: true,
-        default: () => ({}),
-      },
-      body: {
-        type: Object,
         default: () => ({}),
       },
       requestMethod: {
@@ -230,45 +185,23 @@
       },
     },
     data() {
+      console.log('Running here, ApiParameterTemplate.vue');
       return {
-        bodyData: {},
-        responseData: null,
-        httpEndpoint: 'https://eos.greymass.com',
-        keyProvider: '',
+        sharedHttpEndpoint: LocalStorage.get(StorageKeys.HTTP_END_POINT, 'https://eos.greymass.com'),
+        sharedKeyProvider: LocalStorage.get(StorageKeys.KEY_PROVIDER, '+1s'),
         dialogVisible: false,
         form: {
           endPoint: '',
-          keyProvider: '',
-          templateName: '',
           delivery: false,
           type: [],
           resource: '',
           desc: '',
         },
+        select: '',
         formLabelWidth: '200px',
       };
     },
-    computed: {
-      curl() {
-        return `curl --request POST \\
-        --url ${this.httpEndpoint}/${this.title.path || ''} \\
-        --data = ${JSON.stringify(this.bodyData)}`;
-      },
-    },
     methods: {
-      ...mapPanelActions(['traceExecution']),
-      updateKey(key, val) {
-        const keyDef = this.body[key];
-        let kv = { [key]: val };
-        if (keyDef.isJson) {
-          try {
-            kv = { [key]: JSON.parse(val) };
-          } catch (e) {
-            // console.error(e);
-          }
-        }
-        this.bodyData = Object.assign({}, this.bodyData, kv);
-      },
       onClear() {
         this.responseData = null;
         this.httpEndpoint = LocalStorage.get(StorageKeys.HTTP_END_POINT, '');
@@ -280,49 +213,33 @@
           });
         this.bodyData = bodyData;
       },
-      async onSubmit() {
-        try {
-          const eos = EOSAPIService.getEos({
-            config: {
-              httpEndpoint: this.httpEndpoint,
-              keyProvider: this.keyProvider,
-            },
-          });
-          this.responseData = await EOSAPIService[this.requestMethod]({
-            payload: this.bodyData, eos,
-          });
-        } catch (err) {
-          console.error(err);
-        }
-        // noinspection JSCheckFunctionSignatures
-        this.traceExecution({ ...this.$props, key: this.$props.apiKey });
-      },
+      ...mapTemplateActions(['templateSelectTab']),
       onSelect(command) {
-        if (command === '1') {
-          this.httpEndpoint = LocalStorage.get(StorageKeys.HTTP_END_POINT, 'https://eos.greymass.com');
-          this.keyProvider = LocalStorage.get(StorageKeys.KEY_PROVIDER, '+10086');
-        } else {
-          const defaultParam = {httpEndpoint: 'https://eos.greymass.com', keyProvider: '+defaultKey'};
-          const parameter = LocalStorage.get(command, defaultParam);
-          // console.log(parameter);
-          this.httpEndpoint = parameter.httpEndpoint;
-          this.keyProvider = parameter.keyProvider;
+        switch (command) {
+          case '2': {
+            break;
+          }
+          case '3': {
+            break;
+          }
+          case '4': {
+            break;
+          }
+          case '5': {
+            break;
+          }
+          default: {
+            this.sharedHttpEndpoint = LocalStorage.get(StorageKeys.HTTP_END_POINT, 'https://eos.greymass.com');
+            this.sharedKeyProvider = LocalStorage.get(StorageKeys.KEY_PROVIDER, '+10086');
+            break;
+          }
         }
-        // console.log('Param selected: ', command);
+        console.log('Param selected: ', command);
       },
       onAddNewTemplate() {
-        let templateName = parseInt(this.form.templateName) + 1;
-        const parameter = {
-          httpEndpoint: this.form.endPoint, 
-          keyProvider: this.form.keyProvider
-        };
-        templateName = templateName.toString();
-        LocalStorage.update(templateName, parameter);
-        console.log('Param Name: ', templateName);
+        this.sharedHttpEndpoint = this.form.endPoint;
+        this.sharedKeyProvider = this.form.keyProvider;
         this.dialogVisible = false;
-        let readParam = LocalStorage.get(templateName);
-        this.httpEndpoint = readParam.httpEndpoint;
-        this.keyProvider = readParam.keyProvider;
       },
     },
 
