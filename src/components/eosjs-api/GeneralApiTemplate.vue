@@ -302,7 +302,7 @@
           this.httpEndpoint = LocalStorage.get(StorageKeys.HTTP_END_POINT, 'https://eos.greymass.com');
           this.keyProvider = LocalStorage.get(StorageKeys.KEY_PROVIDER, '+10086');
         } else {
-          const defaultParam = {httpEndpoint: 'https://eos.greymass.com', keyProvider: '+defaultKey'};
+          const defaultParam = { httpEndpoint: 'https://eos.greymass.com', keyProvider: '+defaultKey' };
           const parameter = LocalStorage.get(command, defaultParam);
           // console.log(parameter);
           this.httpEndpoint = parameter.httpEndpoint;
@@ -311,16 +311,16 @@
         // console.log('Param selected: ', command);
       },
       onAddNewTemplate() {
-        let templateName = parseInt(this.form.templateName) + 1;
+        let templateName = parseInt(this.form.templateName, 10) + 1;
         const parameter = {
-          httpEndpoint: this.form.endPoint, 
-          keyProvider: this.form.keyProvider
+          httpEndpoint: this.form.endPoint,
+          keyProvider: this.form.keyProvider,
         };
         templateName = templateName.toString();
         LocalStorage.update(templateName, parameter);
         console.log('Param Name: ', templateName);
         this.dialogVisible = false;
-        let readParam = LocalStorage.get(templateName);
+        const readParam = LocalStorage.get(templateName);
         this.httpEndpoint = readParam.httpEndpoint;
         this.keyProvider = readParam.keyProvider;
       },
