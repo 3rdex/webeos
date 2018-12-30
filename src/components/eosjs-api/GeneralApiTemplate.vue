@@ -30,7 +30,7 @@
         font-weight: bold;
       }
       .dropdown-menu {
-        flex-flow: 1;
+        float: right;
       }
     }
   }
@@ -105,10 +105,18 @@
               <el-form-item label="HTTP END POINT" :label-width="formLabelWidth">
                 <el-input v-model="form.endPoint" autocomplete="off"></el-input>
               </el-form-item>
-              <el-form-item label="Key Provider" :label-width="formLabelWidth">
-                <el-input v-model="form.keyProvider" autocomplete="off"></el-input>
+              <el-form-item label="KEY PROVIDER" :label-width="formLabelWidth">
+                <el-input v-model="form.keyProvider" autocomplete="off"
+                  placeholder="Please use either Scatter or input private key"
+                  :disabled="form.keyAuthMode === true"></el-input>
+                <el-tooltip content="Scatter keeps private key safe"
+                  placement="bottom" effect="light">
+                  <el-button>Scatter</el-button>
+                </el-tooltip>&emsp;
+                <el-switch v-model="form.keyAuthMode" @change="onScatterSelect"
+                  :active-value=true :inactive-value=false></el-switch>
               </el-form-item>
-              <el-form-item label="Template Select" :label-width="formLabelWidth">
+              <el-form-item label="SAVE TO " :label-width="formLabelWidth">
                 <el-select v-model="form.templateName"
                 placeholder="Please select Template to store paramters.">
                   <el-option label="paramTemplate1" value="1"></el-option>
@@ -152,8 +160,9 @@
           </el-col>
           <el-col :span="18">
             <div>
-              <el-input v-model="keyProvider"
-                placeholder="your eos account private key"></el-input>
+              <el-input v-model="keyProvider" :disabled="this.mainKeyAuth === true"
+                placeholder="your eos account private key">
+              </el-input>
             </div>
           </el-col>
         </el-row>
@@ -203,6 +212,7 @@
 <script>
   import { createNamespacedHelpers } from 'vuex';
   import { EOSAPIService } from '../../services/EOSAPIService';
+  import { ScatterService } from '../../services/ScatterService';
   import { PANEL_STORE_NAME } from '../../store/modules/panel';
   import { LocalStorage, StorageKeys } from '../../services/LocalStorage';
 
@@ -230,15 +240,19 @@
       },
     },
     data() {
+      const scatterInstance = ScatterService.init();
       return {
         bodyData: {},
         responseData: null,
         httpEndpoint: 'https://eos.greymass.com',
         keyProvider: '',
         dialogVisible: false,
+        mainKeyAuth: false,
+        scatter: scatterInstance,
         form: {
           endPoint: '',
           keyProvider: '',
+          keyAuthMode: false,
           templateName: '',
           delivery: false,
           type: [],
@@ -273,6 +287,7 @@
         this.responseData = null;
         this.httpEndpoint = LocalStorage.get(StorageKeys.HTTP_END_POINT, '');
         this.keyProvider = LocalStorage.get(StorageKeys.KEY_PROVIDER, '');
+        this.mainKeyAuth = false;
         const bodyData = {};
         Object.keys(this.body)
           .forEach((key) => {
@@ -302,21 +317,62 @@
           this.httpEndpoint = LocalStorage.get(StorageKeys.HTTP_END_POINT, 'https://eos.greymass.com');
           this.keyProvider = LocalStorage.get(StorageKeys.KEY_PROVIDER, '+10086');
         } else {
-          const defaultParam = { httpEndpoint: 'https://eos.greymass.com', keyProvider: '+defaultKey' };
-          const parameter = LocalStorage.get(command, defaultParam);
-          // console.log(parameter);
+          // const defaultParam = { httpEndpoint: 'https://eos.greymass.com', keyProvider: '+defaultKey' };
+          const parameter = LocalStorage.get(command);
+          console.log(parameter);
+          this.mainKeyAuth = parameter.keyAuthMode;
+          console.log(this.mainKeyAuth);
           this.httpEndpoint = parameter.httpEndpoint;
-          this.keyProvider = parameter.keyProvider;
+          this.keyProvider = this.mainKeyAuth ? 'using scatter' : parameter.keyProvider;
         }
         // console.log('Param selected: ', command);
       },
+      onScatterSelect() {
+        if (this.form.keyAuthMode === true) {
+          if (typeof scatter === 'undefined') {
+            this.$notify({
+              title: 'Error',
+              message: 'Scatter is not installed. Refresh page after installing.',
+              type: 'error',
+            });
+          } else if (this.scatter !== null) {
+            this.scatter.getIdentity().catch((err) => {
+              if (err.type === 'locked') {
+                this.$notify({
+                  title: 'Warning',
+                  message: 'Scatter is locked. Refresh page after unlocking.',
+                  type: 'warning',
+                });
+              }
+            });
+            this.mainKeyAuth = this.form.keyAuthMode;
+            console.log(this.mainKeyAuth);
+          } else {
+            this.$notify({
+                  title: 'Error',
+                  message: 'Scatter is not found.',
+                  type: 'error',
+            });
+          }
+        }
+      },
       onAddNewTemplate() {
         let templateName = parseInt(this.form.templateName, 10) + 1;
-        const parameter = {
-          httpEndpoint: this.form.endPoint,
-          keyProvider: this.form.keyProvider,
-        };
         templateName = templateName.toString();
+        let parameter = {};
+        if (this.mainKeyAuth === false || typeof scatter === 'undefined') {
+          parameter = {
+            httpEndpoint: this.form.endPoint,
+            keyProvider: this.form.keyProvider,
+            keyAuthMode: this.mainKeyAuth,
+          };
+        } else {
+          parameter = {
+            httpEndpoint: this.form.endPoint,
+            keyProvider: this.scatter,
+            keyAuthMode: this.mainKeyAuth,
+          };
+        }
         LocalStorage.update(templateName, parameter);
         console.log('Param Name: ', templateName);
         this.dialogVisible = false;
