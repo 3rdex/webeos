@@ -5,33 +5,40 @@ import { Config } from '../config';
 ScatterJS.plugins(new ScatterEOS());
 
 export class ScatterService {
-  static scatter = {
+  /* static scatter = {
     identity: {
       hash: '',
       kyc: false,
       name: '',
       publicKey: '',
     },
-  }
+  }; */
 
-  static async init() {
-    if (ScatterService.scatter) return ScatterService.scatter;
-    const connected = await ScatterJS.scatter.connect('WEBEOS');
-    if (connected) {
-      ScatterService.scatter = ScatterJS.scatter;
+  static isScatterExtensionReady = false;
+
+  static isScatterExtensionExist = false;
+
+  static connectionOption = { initTimeout: 1000 };
+
+  static init() {
+    console.log('ScatterService init() start...');
+
+    ScatterJS.scatter.connect('webeos', this.connectionOption).then((connected) => {
+      console.log(`scatter connection result: ${connected}`);
+      // User does not have Scatter Desktop, Mobile or Classic installed.
+      if (!connected) {
+        console.log('scatter connect failed.');
+        this.isScatterExtensionReady = false;
+        return;
+      }
       window.scatter = null;
-      return ScatterService.scatter;
-    }
-    return null;
+      this.isScatterExtensionExist = true;
+      this.isScatterExtensionReady = true;
+    });
   }
 
-  static getScatterNetwork() {
-    return {
-      blockchain: 'eos',
-      host: Config.scatterNetwork.host,
-      port: Config.scatterNetwork.port,
-      protocol: Config.scatterNetwork.protocol,
-      chainId: Config.scatterNetwork.chainId,
-    };
+  static getRequiredFields(env) {
+    const network = Config.getScatterNetwork(env);
+    return { accounts: [network] };
   }
 }

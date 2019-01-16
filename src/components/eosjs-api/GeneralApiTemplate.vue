@@ -1,210 +1,27 @@
 <style scoped lang="scss">
   @import '../../styles/util';
 
-  .api-title-container {
+  .api-container {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     border-radius: 4px;
     margin-bottom: 12px;
-    .summary {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      .action {
-        height: 48px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        background: #61affe;
-        margin-right: 12px;
-        font-weight: bold;
-        min-width: 80px;
-        border-radius: 3px;
-        text-shadow: 0 1px 0 rgba(0, 0, 0, .1);
-        padding-left: 4px;
-        padding-right: 4px;
-      }
-      .path {
-        margin-right: 20px;
-        font-weight: bold;
-      }
-      .dropdown-menu {
-        float: right;
-      }
-    }
-  }
-
-  .api-content-container {
-    > article {
-      padding: 12px;
-    }
-    .el-row {
-      margin-top: 8px;
-    }
-    .general-info, .request-title, .response-title {
-      display: flex;
-      align-items: center;
-      height: 50px;
-    }
-    .header-title, .request-title, .response-title {
-      font-weight: bold;
-      font-size: 14px;
-      background-color: $color-white;
-    }
-    .request-container {
-      .action-row {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 20px;
-      }
-      .curl {
-        margin-top: 20px;
-      }
-    }
-    .response-container {
-    }
-    .curl, .json-response {
-      font-size: 12px;
-      margin: 0;
-      padding: 10px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      -webkit-hyphens: auto;
-      -ms-hyphens: auto;
-      hyphens: auto;
-      border-radius: 4px;
-      background: #41444e;
-      overflow-wrap: break-word;
-      font-weight: 600;
-      color: $color-white;
-    }
   }
 </style>
 
 <template>
   <section>
-    <div class="api-title-container">
-      <div class="summary">
-        <div class="action">POST</div>
-        <div class="path">{{httpEndpoint + (title.path || '')}}</div>
-        <div class="dropdown-menu">
-          <el-dropdown split-button type="primary" @click="dialogVisible = true"
-          @command="onSelect">
-            NewTemplate
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="1">defaultParam</el-dropdown-item>
-              <el-dropdown-item command="2">paramTemplate1</el-dropdown-item>
-              <el-dropdown-item command="3">paramTemplate2</el-dropdown-item>
-              <el-dropdown-item command="4">paramTemplate3</el-dropdown-item>
-              <el-dropdown-item command="5">paramTemplate4</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-          <el-dialog title="New Parameter Template" :visible.sync="dialogVisible" width="50%">
-            <el-form :model="form">
-              <el-form-item label="HTTP END POINT" :label-width="formLabelWidth">
-                <el-input v-model="form.endPoint" autocomplete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="KEY PROVIDER" :label-width="formLabelWidth">
-                <el-input v-model="form.keyProvider" autocomplete="off"
-                  placeholder="Please use either Scatter or input private key"
-                  :disabled="form.keyAuthMode === true"></el-input>
-                <el-tooltip content="Scatter keeps private key safe"
-                  placement="bottom" effect="light">
-                  <el-button>Scatter</el-button>
-                </el-tooltip>&emsp;
-                <el-switch v-model="form.keyAuthMode" @change="onScatterSelect"
-                  :active-value=true :inactive-value=false></el-switch>
-              </el-form-item>
-              <el-form-item label="SAVE TO " :label-width="formLabelWidth">
-                <el-select v-model="form.templateName"
-                placeholder="Please select Template to store paramters.">
-                  <el-option label="paramTemplate1" value="1"></el-option>
-                  <el-option label="paramTemplate2" value="2"></el-option>
-                  <el-option label="paramTemplate3" value="3"></el-option>
-                  <el-option label="paramTemplate4" value="4"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-              <el-button @click="dialogVisible = false">Cancel</el-button>
-              <el-button type="primary" @click="onAddNewTemplate">Confirm</el-button>
-            </span>
-          </el-dialog>
-        </div>
-      </div>
-    </div>
-    <div class="api-content-container background-color-blue">
-      <article class="header-title">
-        Config EOS
-      </article>
-      <article class="header-content">
-        <el-row>
-          <el-col :span="6"><p class="bold font-12">Name</p></el-col>
-          <el-col :span="18"><p class="bold font-12">Description</p></el-col>
-        </el-row>
-        <div class="divider"></div>
-        <el-row>
-          <el-col :span="6">
-            <div><p class="bold font-14">HTTP END POINT</p></div>
-          </el-col>
-          <el-col :span="18">
-            <div>
-              <el-input v-model="httpEndpoint" placeholder="http://127.0.0.1:8888"></el-input>
-            </div>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="6">
-            <div><p class="bold font-14">Key Provider</p></div>
-          </el-col>
-          <el-col :span="18">
-            <div>
-              <el-input v-model="keyProvider" :disabled="this.mainKeyAuth === true"
-                placeholder="your eos account private key">
-              </el-input>
-            </div>
-          </el-col>
-        </el-row>
-      </article>
-      <article class="request-title">
-        Request Body
-      </article>
-      <article class="request-container">
-        <el-row>
-          <el-col :span="6"><p class="bold font-12">Name</p></el-col>
-          <el-col :span="18"><p class="bold font-12">Description</p></el-col>
-        </el-row>
-        <div class="divider"></div>
-        <div slot="request" v-if="bodyData">
-          <el-row v-for="(item, key) in body" :key="key">
-            <el-col :span="6">
-              <div>
-                <p class="bold font-14">{{item.label}}</p>
-              </div>
-            </el-col>
-            <el-col :span="18">
-              <div>
-                <el-input :type="item.isJson ? 'textarea' : ''"
-                          v-model="bodyData[key]" :placeholder="item.description"></el-input>
-              </div>
-            </el-col>
-          </el-row>
-        </div>
-        <pre class="curl">{{curl}}</pre>
-        <div class="action-row">
-          <el-button type="primary" class="submit" @click.stop="onSubmit">
-            Submit
-          </el-button>
-          <el-button type="warning" class="warning" @click.stop="onClear">
-            Clear
-          </el-button>
-        </div>
-      </article>
-      <article class="response-title">Responses</article>
-      <article class="response-container">
-        <pre class="json-response">{{responseData}}</pre>
-      </article>
+    <div class="api-container">
+      <api-title
+        :action="action"
+        :path="apiPath"></api-title>
+      <api-config
+        :httpEndpoint="httpEndpoint"
+        :privateKey="privateKey"
+        :keyAuthMode="keyAuthMode"
+        v-on:selectTemplate="readTemplate"
+        v-on:clear="onClear"/>
+      <api-content/>
     </div>
   </section>
 </template>
@@ -215,11 +32,19 @@
   import { ScatterService } from '../../services/ScatterService';
   import { PANEL_STORE_NAME } from '../../store/modules/panel';
   import { LocalStorage, StorageKeys } from '../../services/LocalStorage';
+  import ApiTitle from '../ApiTitle';
+  import ApiConfig from '../ApiConfig';
+  import ApiContent from '../ApiContent';
 
   const { mapActions: mapPanelActions } = createNamespacedHelpers(PANEL_STORE_NAME);
 
   export default {
     name: 'GeneralApiTemplate',
+    components: {
+      ApiTitle,
+      ApiConfig,
+      ApiContent,
+    },
     props: {
       apiKey: {
         type: String,
@@ -240,7 +65,11 @@
       },
     },
     data() {
-      const scatterInstance = ScatterService.init();
+      console.log('data() method...');
+      ScatterService.init();
+      const endPoint = 'https://eos.greymass.com'; // 需要从ApiConfig中emit给父组件, 暂用hardcore
+      const path = endPoint + this.title.path || '';
+      console.log(path);
       return {
         bodyData: {},
         responseData: null,
@@ -248,18 +77,8 @@
         keyProvider: '',
         dialogVisible: false,
         mainKeyAuth: false,
-        scatter: scatterInstance,
-        form: {
-          endPoint: '',
-          keyProvider: '',
-          keyAuthMode: false,
-          templateName: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: '',
-        },
-        formLabelWidth: '200px',
+        apiPath: path,
+        action: 'POST',
       };
     },
     computed: {
@@ -312,77 +131,39 @@
         // noinspection JSCheckFunctionSignatures
         this.traceExecution({ ...this.$props, key: this.$props.apiKey });
       },
-      onSelect(command) {
-        if (command === '1') {
-          this.httpEndpoint = LocalStorage.get(StorageKeys.HTTP_END_POINT, 'https://eos.greymass.com');
-          this.keyProvider = LocalStorage.get(StorageKeys.KEY_PROVIDER, '+10086');
+      readTemplate(templateName) {
+        console.log(`templateName is ${templateName}`);
+        const readParam = LocalStorage.get(templateName);
+        if (readParam === null) {
+          this.$notify({
+            title: 'Warning',
+            message: 'This template paramater is null.',
+            type: 'warning',
+          });
         } else {
-          // const defaultParam = { httpEndpoint: 'https://eos.greymass.com', keyProvider: '+defaultKey' };
-          const parameter = LocalStorage.get(command);
-          console.log(parameter);
-          this.mainKeyAuth = parameter.keyAuthMode;
-          console.log(this.mainKeyAuth);
-          this.httpEndpoint = parameter.httpEndpoint;
-          this.keyProvider = this.mainKeyAuth ? 'using scatter' : parameter.keyProvider;
-        }
-        // console.log('Param selected: ', command);
-      },
-      onScatterSelect() {
-        if (this.form.keyAuthMode === true) {
-          if (typeof scatter === 'undefined') {
+          this.httpEndpoint = readParam.httpEndpoint;
+          this.keyProvider = readParam.keyProvider;
+          this.mainKeyAuth = readParam.keyAuthMode;
+          if (this.httpEndpoint === '' || this.keyProvider === '') {
             this.$notify({
-              title: 'Error',
-              message: 'Scatter is not installed. Refresh page after installing.',
-              type: 'error',
+              title: 'Warning',
+              message: 'This template paramater is lacking something important.',
+              type: 'warning',
             });
-          } else if (this.scatter !== null) {
-            this.scatter.getIdentity().catch((err) => {
-              if (err.type === 'locked') {
-                this.$notify({
-                  title: 'Warning',
-                  message: 'Scatter is locked. Refresh page after unlocking.',
-                  type: 'warning',
-                });
-              }
-            });
-            this.mainKeyAuth = this.form.keyAuthMode;
-            console.log(this.mainKeyAuth);
           } else {
             this.$notify({
-                  title: 'Error',
-                  message: 'Scatter is not found.',
-                  type: 'error',
+              title: 'Success',
+              message: 'This template paramater is loaded successfully.',
+              type: 'success',
             });
           }
         }
       },
-      onAddNewTemplate() {
-        let templateName = parseInt(this.form.templateName, 10) + 1;
-        templateName = templateName.toString();
-        let parameter = {};
-        if (this.mainKeyAuth === false || typeof scatter === 'undefined') {
-          parameter = {
-            httpEndpoint: this.form.endPoint,
-            keyProvider: this.form.keyProvider,
-            keyAuthMode: this.mainKeyAuth,
-          };
-        } else {
-          parameter = {
-            httpEndpoint: this.form.endPoint,
-            keyProvider: this.scatter,
-            keyAuthMode: this.mainKeyAuth,
-          };
-        }
-        LocalStorage.update(templateName, parameter);
-        console.log('Param Name: ', templateName);
-        this.dialogVisible = false;
-        const readParam = LocalStorage.get(templateName);
-        this.httpEndpoint = readParam.httpEndpoint;
-        this.keyProvider = readParam.keyProvider;
-      },
     },
 
     mounted() {
+      console.log('mounted() method...');
+      // const scatterInstance = ScatterService.init();
       if (this.body) {
         this.bodyData = {};
         Object.keys(this.body)

@@ -49,28 +49,6 @@
 </style>
 <template>
   <section class="collapse-item-wrapper background-color-blue">
-    <article class="header-title">
-      Config EOS
-    </article>
-    <article class="header-content">
-      <el-row>
-        <el-col :span="6"><p class="bold font-12">Name</p></el-col>
-        <el-col :span="18"><p class="bold font-12">Description</p></el-col>
-      </el-row>
-      <div class="divider"></div>
-      <el-row>
-        <el-col :span="6"><p class="bold font-12">httpEndpoint</p></el-col>
-        <el-col :span="18">
-          <el-input :value="httpEndpoint" @change="updatehttpEndpoint"></el-input>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="6"><p class="bold font-12">PrivateKey</p></el-col>
-        <el-col :span="18">
-          <el-input :value="privateKey" @change="updatePrivateKey"></el-input>
-        </el-col>
-      </el-row>
-    </article>
     <article class="request-title">
       Request Body
     </article>
