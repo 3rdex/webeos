@@ -8,12 +8,11 @@
     .el-row {
       margin-top: 8px;
     }
-    .general-info, .request-title, .response-title {
+    .config-item {
       display: flex;
       align-items: center;
-      height: 50px;
     }
-    .header-title, .request-title, .response-title {
+    .header-title, {
       font-weight: bold;
       font-size: 14px;
       background-color: $color-white;
@@ -110,19 +109,19 @@
         <el-col :span="18"><p class="bold font-14">Description</p></el-col>
       </el-row>
       <div class="divider"></div>
-      <el-row>
+      <el-row class="config-item">
         <el-col :span="6"><p class="bold font-14">Http End Point</p></el-col>
         <el-col :span="18">
           {{this.httpEndpoint}}
         </el-col>
       </el-row>
-      <el-row>
+      <el-row class="config-item">
         <el-col :span="6"><p class="bold font-14">Private Key</p></el-col>
         <el-col :span="18">
           {{this.privateKey}}
         </el-col>
       </el-row>
-      <el-row>
+      <el-row class="config-item">
         <el-col :span="6"><p class="bold font-14">Use Scatter</p></el-col>
         <el-col :span="18">
           {{this.keyAuthMode}}
@@ -164,7 +163,7 @@
           endPoint: '',
           keyProvider: '',
           keyAuthMode: false,
-          templateName: '',
+          templateName: '0',
         },
       };
     },
@@ -191,7 +190,7 @@
               if (id !== null && id.publicKey.indexOf('EOS') === 0) {
                 this.$notify({
                   title: 'Success',
-                  message: 'Scatter Authoration Completed.',
+                  message: 'Scatter Authorization Completed.',
                   type: 'success',
                 });
               }
@@ -243,7 +242,10 @@
         }
       },
       onAddNewTemplate() {
-        const templateName = parseInt(this.form.templateName, 10);
+        let templateName = '0';
+        if (!Number.isNaN(this.form.templateName)) {
+          templateName = parseInt(this.form.templateName, 10).toString();
+        }
         console.log(`template name in onAddNewTemplate() method is ${templateName}`);
         let parameter = {};
         if (this.keyAuthMode === false || typeof window.scatter === 'undefined') {
@@ -258,7 +260,7 @@
           parameter = {
             httpEndpoint: this.form.endPoint,
             keyProvider: this.scatter,
-            keyAuthMode: this.mainKeyAuth,
+            keyAuthMode: this.keyAuthMode,
           };
           this.httpEndpoint = this.form.endPoint;
           this.privatekey = this.scatter;

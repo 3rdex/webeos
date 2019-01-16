@@ -8,7 +8,11 @@
     .el-row {
       margin-top: 8px;
     }
-    .general-info, .request-title, .response-title {
+    .row-item {
+      display: flex;
+      align-items: center;
+    }
+    .request-title, .response-title {
       display: flex;
       align-items: center;
       height: 50px;
@@ -58,7 +62,21 @@
         <el-col :span="18"><p class="bold font-12">Description</p></el-col>
       </el-row>
       <div class="divider"></div>
-      <slot name="request"></slot>
+      <div slot="request" v-if="bodyData">
+        <el-row class="row-item" v-for="(item, key) in body" :key="key">
+          <el-col :span="6">
+            <div>
+              <p class="bold font-14">{{item.label}}</p>
+            </div>
+          </el-col>
+          <el-col :span="18">
+            <div>
+              <el-input :type="item.isJson ? 'textarea' : ''"
+                        v-model="bodyData[key]" :placeholder="item.description"></el-input>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
       <pre class="curl">{{curl}}</pre>
       <div class="action-row">
         <el-button type="primary" class="submit" @click.stop="onSubmit">
@@ -71,7 +89,7 @@
     </article>
     <article class="response-title">Responses</article>
     <article class="response-container">
-      <pre class="json-response">{{data}}</pre>
+      <pre class="json-response">{{responseData}}</pre>
     </article>
   </section>
 </template>
@@ -80,41 +98,29 @@
   export default {
     name: 'ApiContent',
     props: {
-      generalInfo: {
+      curl: {
         type: String,
         required: true,
       },
-      curl: '',
-      data: null,
-      requirePrivateKey: {
-        type: Boolean,
-        default: false,
+      bodyData: {
+        type: Object,
+        required: true,
+      },
+      responseData: {
+        type: Object,
         required: false,
       },
-      httpEndpoint: {
-        type: String,
-        default: 'http://127.0.0.1:8888',
-      },
-      privateKey: {
-        type: String,
-        default: '',
+      body: {
+        type: Object,
+        default: () => ({}),
       },
     },
     methods: {
       onSubmit() {
-        this.$emit('execute');
+        this.$emit('executeCommand');
       },
       onClear() {
-        this.httpEndpoint = '';
-        this.privateKey = '';
         this.$emit('clear');
-      },
-      updatehttpEndpoint(val) {
-        console.log('in update http end point ', val);
-        this.$emit('change-http-end-point', val);
-      },
-      updatePrivateKey(val) {
-        this.$emit('change-private-key', val);
       },
     },
   };

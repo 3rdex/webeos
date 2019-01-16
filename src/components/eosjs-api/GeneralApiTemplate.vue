@@ -17,11 +17,16 @@
         :path="apiPath"></api-title>
       <api-config
         :httpEndpoint="httpEndpoint"
-        :privateKey="privateKey"
-        :keyAuthMode="keyAuthMode"
-        v-on:selectTemplate="readTemplate"
+        :privateKey="keyProvider"
+        :keyAuthMode="mainKeyAuth"
+        v-on:selectTemplate="readTemplate"/>
+      <api-content
+        :curl="curl"
+        :bodyData="bodyData"
+        :responseData="responseData"
+        :body="propbody"
+        v-on:executeCommand="onSubmit"
         v-on:clear="onClear"/>
-      <api-content/>
     </div>
   </section>
 </template>
@@ -72,6 +77,7 @@
       console.log(path);
       return {
         bodyData: {},
+        propbody: this.body,
         responseData: null,
         httpEndpoint: 'https://eos.greymass.com',
         keyProvider: '',
@@ -81,11 +87,18 @@
         action: 'POST',
       };
     },
+    /* watch: {
+      updateCurl() {
+        this.curl = `curl --request POST \\
+          --url ${this.httpEndpoint}/${this.title.path || ''} \\
+          --data = ${JSON.stringify(this.bodyData)}`;
+      },
+    }, */
     computed: {
       curl() {
         return `curl --request POST \\
-        --url ${this.httpEndpoint}/${this.title.path || ''} \\
-        --data = ${JSON.stringify(this.bodyData)}`;
+          --url ${this.httpEndpoint}/${this.title.path || ''} \\
+          --data = ${JSON.stringify(this.bodyData)}`;
       },
     },
     methods: {
@@ -151,11 +164,7 @@
               type: 'warning',
             });
           } else {
-            this.$notify({
-              title: 'Success',
-              message: 'This template paramater is loaded successfully.',
-              type: 'success',
-            });
+            console.log('This template paramater is loaded successfully.');
           }
         }
       },
