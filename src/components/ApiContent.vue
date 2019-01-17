@@ -77,7 +77,7 @@
           </el-col>
         </el-row>
       </div>
-      <pre class="curl">{{curl}}</pre>
+      <pre class="curl">{{this.curl}}</pre>
       <div class="action-row">
         <el-button type="primary" class="submit" @click.stop="onSubmit">
           Submit

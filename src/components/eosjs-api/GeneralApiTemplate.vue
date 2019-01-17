@@ -37,6 +37,7 @@
   import { ScatterService } from '../../services/ScatterService';
   import { PANEL_STORE_NAME } from '../../store/modules/panel';
   import { LocalStorage, StorageKeys } from '../../services/LocalStorage';
+  import { SessionStorage } from '../../services/SessionStorage';
   import ApiTitle from '../ApiTitle';
   import ApiConfig from '../ApiConfig';
   import ApiContent from '../ApiContent';
@@ -72,9 +73,13 @@
     data() {
       console.log('data() method...');
       ScatterService.init();
-      const endPoint = 'https://eos.greymass.com'; // 需要从ApiConfig中emit给父组件, 暂用hardcore
+      let endPoint = '';
+      const templateNum = SessionStorage.get('templateNum');
+      if (templateNum !== null) {
+        const readParam = LocalStorage.get(templateNum);
+        endPoint = readParam.httpEndpoint;
+      }
       const path = endPoint + this.title.path || '';
-      console.log(path);
       return {
         bodyData: {},
         propbody: this.body,
@@ -87,23 +92,22 @@
         action: 'POST',
       };
     },
-    /* watch: {
-      updateCurl() {
-        this.curl = `curl --request POST \\
-          --url ${this.httpEndpoint}/${this.title.path || ''} \\
-          --data = ${JSON.stringify(this.bodyData)}`;
-      },
-    }, */
     computed: {
-      curl() {
-        return `curl --request POST \\
-          --url ${this.httpEndpoint}/${this.title.path || ''} \\
-          --data = ${JSON.stringify(this.bodyData)}`;
+      curl: {
+        get() {
+          return `curl --request POST \\
+            --url ${this.httpEndpoint}/${this.title.path || ''} \\
+            --data = ${JSON.stringify(this.bodyData)}`;
+        },
+        set(val) {
+          console.log(val);
+        },
       },
     },
     methods: {
       ...mapPanelActions(['traceExecution']),
       updateKey(key, val) {
+        console.log('updateKey() method...');
         const keyDef = this.body[key];
         let kv = { [key]: val };
         if (keyDef.isJson) {
@@ -128,6 +132,7 @@
         this.bodyData = bodyData;
       },
       async onSubmit() {
+        console.log(`on Submit() method: ${this.requestMethod}`);
         try {
           const eos = EOSAPIService.getEos({
             config: {
@@ -139,13 +144,19 @@
             payload: this.bodyData, eos,
           });
         } catch (err) {
-          console.error(err);
+            this.$notify({
+              title: 'Error',
+              message: 'error',
+              type: 'error',
+            });
+            console.log(err);
         }
         // noinspection JSCheckFunctionSignatures
         this.traceExecution({ ...this.$props, key: this.$props.apiKey });
       },
       readTemplate(templateName) {
         console.log(`templateName is ${templateName}`);
+        SessionStorage.update('templateNum', templateName);
         const readParam = LocalStorage.get(templateName);
         if (readParam === null) {
           this.$notify({
@@ -164,7 +175,8 @@
               type: 'warning',
             });
           } else {
-            console.log('This template paramater is loaded successfully.');
+            // console.log('This template paramater is loaded successfully.');
+            this.apiPath = this.httpEndpoint + this.title.path || '';
           }
         }
       },

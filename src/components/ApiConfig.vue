@@ -254,16 +254,16 @@
             keyProvider: this.form.keyProvider,
             keyAuthMode: this.keyAuthMode,
           };
-          this.httpEndpoint = this.form.endPoint;
-          this.privateKey = this.form.keyProvider;
+          // this.httpEndpoint = this.form.endPoint;
+          // this.privateKey = this.form.keyProvider;
         } else {
           parameter = {
             httpEndpoint: this.form.endPoint,
             keyProvider: this.scatter,
             keyAuthMode: this.keyAuthMode,
           };
-          this.httpEndpoint = this.form.endPoint;
-          this.privatekey = this.scatter;
+          // this.httpEndpoint = this.form.endPoint;
+          // this.privatekey = this.scatter;
         }
         LocalStorage.update(templateName, parameter);
         this.dialogVisible = false;
