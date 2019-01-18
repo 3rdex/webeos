@@ -51,7 +51,7 @@
       "code": {
         "val": "",
         "placeHolder": "eosio",
-        "label": "code"
+        "label": "code(required)"
       },
       "scope": {
         "val": "",

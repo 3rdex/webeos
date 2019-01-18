@@ -41,7 +41,6 @@
     <div class="summary">
       <div class="action">{{action}}</div>
       <div class="path">{{path}}</div>
-      <div class="description">{{description}}</div>
     </div>
   </div>
 </template>
@@ -59,11 +58,6 @@
         type: String,
         required: true,
         default: '/',
-      },
-      description: {
-        type: String,
-        required: true,
-        default: 'get root',
       },
     },
   };
